@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from core.models import Zone, Schedule, Permission, ActivityLog
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, ZoneSerializer, ScheduleSerializer, PermissionSerializer, ActivityLogSerializer
-
+from rest_framework.permissions import AllowAny
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -12,7 +12,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ZoneViewSet(viewsets.ModelViewSet):
     queryset = Zone.objects.all()
     serializer_class = ZoneSerializer
-
+    permission_classes = [AllowAny]
 
 class ScheduleViewSet(viewsets.ModelViewSet):
     queryset = Schedule.objects.all()

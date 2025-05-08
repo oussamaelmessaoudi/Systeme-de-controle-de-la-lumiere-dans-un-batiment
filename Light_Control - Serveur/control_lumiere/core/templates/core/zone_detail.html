@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+{% block content %}
+<h2>Control Zone: {{ zone.name }}</h2>
+<p>Building: {{ zone.building }}</p>
+<p>Floor: {{ zone.floor }}</p>
+<p>Current State: {{ zone.current_state|yesno:"On,Off" }}</p>
+
+{% if error %}
+    <p style="color: red;">Error: {{ error }}</p>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="turn_on">Turn On</button>
+    <button type="submit" name="action" value="turn_off">Turn Off</button>
+</form>
+
+<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+{% endblock %}
