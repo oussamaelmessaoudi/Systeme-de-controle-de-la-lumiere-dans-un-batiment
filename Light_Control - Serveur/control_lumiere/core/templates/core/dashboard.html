@@ -1,0 +1,19 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h2>Dashboard</h2>
+<h3>Your Zones</h3>
+{% if zones %}
+    <ul>
+        {% for zone in zones %}
+            <li>
+                {{ zone.name }} ({{ zone.building }}, Floor {{ zone.floor }})
+                - State: {{ zone.current_state|yesno:"On,Off" }}
+                <a href="{% url 'control_zone' zone.id %}">Control</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>You have no zones assigned.</p>
+{% endif %}
+{% endblock %}
