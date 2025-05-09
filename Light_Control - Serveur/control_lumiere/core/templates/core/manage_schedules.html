@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% load bootstrap5 %}
+{% block content %}
+<h2>Manage Schedules</h2>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+<h3>Add New Schedule</h3>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">Add Schedule</button>
+    {% endbuttons %}
+</form>
+<h3>Existing Schedules</h3>
+<ul class="list-group">
+    {% for schedule in schedules %}
+        <li class="list-group-item">
+            {{ schedule.zone.name }} - {{ schedule.action }} from {{ schedule.start_time }} to {{ schedule.end_time }} on {{ schedule.days }}
+            (Active: {{ schedule.is_active }}, Valid: {{ schedule.valid_from }} - {{ schedule.valid_until|default:"No end date" }})
+            <a href="{% url 'delete_schedule' schedule.id %}" class="btn btn-danger btn-sm">Delete</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item">No schedules found.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+{% endblock %}

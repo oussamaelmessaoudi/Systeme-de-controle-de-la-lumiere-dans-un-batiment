@@ -64,12 +64,16 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
+                'django.contrib.auth.context_processors.auth',  # Nécessaire pour les variables comme {{ user }}
                 'django.contrib.messages.context_processors.messages',
             ],
         },
     },
 ]
+
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'  # Redirige vers le tableau de bord après connexion
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 WSGI_APPLICATION = 'control_lumiere.wsgi.application'
 
@@ -79,8 +83,12 @@ WSGI_APPLICATION = 'control_lumiere.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'light_control',
+        'USER': 'light_user',
+        'PASSWORD': '123456',
+        'HOST': 'localhost',
+        'PORT': '5432',  # Port par défaut de PostgreSQL
     }
 }
 
