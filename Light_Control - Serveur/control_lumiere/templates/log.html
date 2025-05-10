@@ -1,0 +1,166 @@
+{% extends 'base_admin.html' %}
+
+{% block contenu %}
+    <div class="container mt-5">
+        <!-- En-tête -->
+        <div class="bg-primary text-white p-3 mb-4">
+            <h2 class="m-0">Journal des Activités - Gestion de l'Éclairage</h2>
+        </div>
+
+        <!-- Card pour les logs -->
+        <div class="card">
+            <div class="card-body">
+                <!-- Titre et bouton d'export -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <a href="#" class="text-decoration-none text-primary d-flex align-items-center">
+                        <i class="bi bi-clock-history me-2"></i> Historique des Actions Utilisateurs
+                    </a>
+                    <button class="btn btn-outline-secondary">
+                        <i class="bi bi-download"></i> Exporter les logs
+                    </button>
+                </div>
+
+                <!-- Filtres avancés -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <label for="filter-etage" class="form-label">Étage</label>
+                        <select class="form-select" id="filter-etage">
+                            <option value="">Tous les étages</option>
+                            <option value="1">Étage 1</option>
+                            <option value="2">Étage 2</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-salle" class="form-label">Salle</label>
+                        <select class="form-select" id="filter-salle">
+                            <option value="">Toutes les salles</option>
+                            <option value="Salle de réunion">Salle de réunion</option>
+                            <option value="Bureau 101">Bureau 101</option>
+                            <option value="Couloir Est">Couloir Est</option>
+                            <option value="Accueil">Accueil</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-utilisateur" class="form-label">Utilisateur</label>
+                        <select class="form-select" id="filter-utilisateur">
+                            <option value="">Tous les utilisateurs</option>
+                            <option value="Aide">Service Aide</option>
+                            <option value="Bide">Service Bide</option>
+                            <option value="Auvrier">Auvrier</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filter-action" class="form-label">Action</label>
+                        <select class="form-select" id="filter-action">
+                            <option value="">Toutes les actions</option>
+                            <option value="allumage">Allumage</option>
+                            <option value="extinction">Extinction</option>
+                            <option value="modification">Modification</option>
+                            <option value="programmation">Programmation</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Tableau des logs -->
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date/Heure</th>
+                                <th>Étage</th>
+                                <th>Localisation</th>
+                                <th>Utilisateur</th>
+                                <th>Action</th>
+                                <th>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Exemple de données - À remplacer par des données dynamiques -->
+                            <tr>
+                                <td>10/05/2023 14:30:15</td>
+                                <td>Étage 1</td>
+                                <td>Salle de réunion</td>
+                                <td>Aide</td>
+                                <td><span class="badge bg-success">Allumage</span></td>
+                                <td>Allumage manuel via dashboard</td>
+                            </tr>
+                            <tr>
+                                <td>10/05/2023 14:25:42</td>
+                                <td>Étage 1</td>
+                                <td>Bureau 101</td>
+                                <td>Bide</td>
+                                <td><span class="badge bg-danger">Extinction</span></td>
+                                <td>Extinction programmée</td>
+                            </tr>
+                            <tr>
+                                <td>10/05/2023 13:58:03</td>
+                                <td>Étage 2</td>
+                                <td>Couloir Est</td>
+                                <td>Auvrier</td>
+                                <td><span class="badge bg-info">Modification</span></td>
+                                <td>Changement des horaires: 18h-06h</td>
+                            </tr>
+                            <tr>
+                                <td>10/05/2023 11:32:47</td>
+                                <td>Étage 1</td>
+                                <td>Accueil</td>
+                                <td>Aide</td>
+                                <td><span class="badge bg-primary">Programmation</span></td>
+                                <td>Nouvelle programmation horaire</td>
+                            </tr>
+                            <tr>
+                                <td>10/05/2023 09:15:22</td>
+                                <td>Étage 2</td>
+                                <td>Salle de réunion</td>
+                                <td>Bide</td>
+                                <td><span class="badge bg-warning text-dark">Réglage</span></td>
+                                <td>Intensité lumineuse ajustée à 75%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Navigation des logs">
+                    <ul class="pagination justify-content-center mt-4">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Suivant</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script pour le filtrage -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filtres interactifs
+            const filters = ['etage', 'salle', 'utilisateur', 'action'];
+            
+            filters.forEach(filter => {
+                document.getElementById(`filter-${filter}`).addEventListener('change', function() {
+                    applyFilters();
+                });
+            });
+
+            function applyFilters() {
+                // Ici, vous implémenteriez la logique de filtrage réelle
+                // Pour l'exemple, nous allons simplement afficher les filtres sélectionnés
+                const selectedFilters = {};
+                filters.forEach(filter => {
+                    selectedFilters[filter] = document.getElementById(`filter-${filter}`).value;
+                });
+                
+                console.log("Filtres appliqués:", selectedFilters);
+                // En production, vous feriez une requête AJAX avec ces paramètres
+            }
+        });
+    </script>
+{% endblock %}

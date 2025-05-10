@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Bootstrap CSS (version unique recommandée) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Inclusion de Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap @5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Inclusion de Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons @1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .custom-bottom-nav {
+            background-color: #0d6efd;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-btn {
+            margin: 0 10px; /* Espacement augmenté entre les boutons */
+            min-width: 120px;
+            padding: 0.375rem 1rem; /* Padding uniforme */
+        }
+        .navbar-nav {
+            align-items: center;
+            gap: 15px; /* Espacement supplémentaire */
+        }
+        .nav-info {
+            color: white;
+            padding: 0.5rem 1rem;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar du haut -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a href="/logout/" class="btn btn-light text-primary nav-btn">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                     <li class="nav-item">
+                        <a href="/dashboard_admin/" class="btn btn-light text-primary nav-btn">
+                            <i class="bi bi-lightbulb"></i> Gestion de l'Éclairage
+                        </a>
+                    </li>                   
+                    <li class="nav-item">
+                        <a href="/gestion_utilisateur/" class="btn btn-light text-primary nav-btn">
+                            <i class="bi bi-people"></i> Gestion Utilisateur
+                        </a>
+                    </li>
+                                        <li class="nav-item">
+                        <a href="/horaire/" class="btn btn-light text-primary nav-btn">
+                            <i class="bi bi-alarm"></i> Gestion horaire
+                        </a>
+                    </li>
+                                        <li class="nav-item">
+                        <a href="/log/" class="btn btn-light text-primary nav-btn">
+                            <i class="bi bi-archive"></i> log
+                        </a>
+                    </li>      
+                    <li class="nav-item">
+                        <span class="nav-info">
+                            <i class="bi bi-building me-1"></i> Nom.batiment
+                        </span>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-info">
+                            <i class="bi bi-person me-1"></i> Nom.utilisateur
+                        </span>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="container-fluid mt-3">
+        {% block contenu %}{% endblock %}
+    </div>
+
+    <!-- Navbar du bas -->
+    <nav class="navbar fixed-bottom navbar-dark bg-primary">
+        <a class="navbar-brand ms-3" href="#">
+            <i class="bi bi-box-arrow-right"></i> Log out
+        </a>
+    </nav>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

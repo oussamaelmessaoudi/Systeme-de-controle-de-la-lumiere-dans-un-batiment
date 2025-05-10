@@ -1,0 +1,246 @@
+{% extends 'base_admin.html' %}
+
+{% block contenu %}
+<style>
+    .salle-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #0d6efd;
+    }
+    .salle-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .badge-on {
+        background-color: #28a745;
+    }
+    .badge-off {
+        background-color: #6c757d;
+    }
+    .etage-title {
+        border-bottom: 2px solid #0d6efd;
+        padding-bottom: 8px;
+        margin-top: 30px;
+        margin-bottom: 20px;
+    }
+    .content-spacing {
+        margin-top: 40px; /* Espace sous la navbar */
+        margin-bottom: 80px; /* Espace au-dessus de la navbar du bas */
+    }
+    .btn-action-group {
+        margin-bottom: 20px;
+    }
+    .btn-light-control {
+        margin: 0 5px;
+    }
+</style>
+
+<div class="container-fluid content-spacing">
+    <h1 class="text-center mb-5">Gestion de l'Éclairage</h1>
+    
+    <!-- Formulaire d'ajout -->
+   <div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h1 class="card-title text-center mb-4">Ajouter un nouvel Étage ou une Pièce</h1>
+            
+            <form>
+                <!-- Section Ajouter un Étage -->
+                <div class="mb-4 p-3 border rounded">
+                    <h5 class="mb-3"><strong>Ajouter un Étage</strong></h5>
+                    
+                    <div class="mb-3">
+                        <label for="etageNom" class="form-label">Nom de l'étage</label>
+                        <input type="text" class="form-control" id="etageNom" placeholder="Ex: RDC, Étage 1...">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="pieceNom" class="form-label">Nom de la pièce (optionnel)</label>
+                        <input type="text" class="form-control" id="pieceNom" placeholder="Ex: Salon, Chambre...">
+                    </div>
+                </div>
+                
+                <!-- Boutons Ajouter/Supprimer -->
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ajouter
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- Étage 1 -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="etage-title text-primary">Etage 1</h2>
+            <div class="btn-action-group">
+                <button class="btn btn-success btn-sm me-2">
+                    <i class="bi bi-lightbulb"></i> Allumer tout
+                </button>
+                <button class="btn btn-danger btn-sm">
+                    <i class="bi bi-lightbulb-off"></i> Éteindre tout
+                </button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Salle de réunion -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Salle de réunion</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Alice</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bureau 101 -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Bureau 101</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Bob</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle de Couloir Est -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Couloir Est</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Alice</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accueil -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Accueil</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Bob</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Étage 2 -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="etage-title text-primary">Etage 2</h2>
+            <div class="btn-action-group">
+                <button class="btn btn-success btn-sm me-2">
+                    <i class="bi bi-lightbulb"></i> Allumer tout
+                </button>
+                <button class="btn btn-danger btn-sm">
+                    <i class="bi bi-lightbulb-off"></i> Éteindre tout
+                </button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Salles de l'étage 2... -->
+             <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Salle de réunion</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Alice</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bureau 101 -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Bureau 101</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Bob</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salle de Couloir Est -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Couloir Est</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Alice</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accueil -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100 salle-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Accueil</h5>
+                        <p class="card-text text-muted small">Dernier utilisateur : Bob</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge badge-on text-white p-2">ON</span>
+                            <div>
+                                <button class="btn btn-sm btn-outline-danger btn-light-control">Éteindre</button>
+                                <button class="btn btn-sm btn-outline-success btn-light-control">Allumer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
