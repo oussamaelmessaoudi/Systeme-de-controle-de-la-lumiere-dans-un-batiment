@@ -63,3 +63,12 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.action} on {self.zone.name} at {self.timestamp}"
+
+class Analytics(models.Model):
+    zone_id = models.IntegerField(default=1)  # Add default
+    metric_type = models.CharField(max_length=50)
+    metric_value = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'core_analytics'

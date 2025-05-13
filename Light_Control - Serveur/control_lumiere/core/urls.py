@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from core.views import PredictionView, predictions_dashboard
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
@@ -12,4 +13,6 @@ urlpatterns = [
     path('manage-zones/delete/<int:zone_id>/', views.delete_zone, name='delete_zone'),
     path('manage-schedules/', views.manage_schedules, name='manage_schedules'),
     path('manage-schedules/delete/<int:schedule_id>/', views.delete_schedule, name='delete_schedule'),
+    path('api/predictions/', PredictionView.as_view(), name='predictions'),
+    path('api/predictions/<int:zone_id>/', PredictionView.as_view(), name='predictions-zone'),
 ]

@@ -1,19 +1,523 @@
 {% extends "core/base.html" %}
 {% block content %}
-<h2>Control Zone: {{ zone.name }}</h2>
-<p>Building: {{ zone.building }}</p>
-<p>Floor: {{ zone.floor }}</p>
-<p>Current State: {{ zone.current_state|yesno:"On,Off" }}</p>
+<div class="brutal-container">
+  <div class="brutal-header">
+    <h1 class="brutal-title">ZONE CONTROL</h1>
+    <div class="system-status">
+      <div class="status-indicator online"></div>
+      <span>CONTROL MODE</span>
+      <div class="time-display" id="clock">00:00:00</div>
+    </div>
+  </div>
+  
+  {% if error %}
+    <div class="message-container">
+      <div class="message error">
+        <div class="message-icon">!</div>
+        <div class="message-text">{{ error }}</div>
+      </div>
+    </div>
+  {% endif %}
+  
+  <div class="zone-detail-panel panel">
+    <div class="panel-header">
+      <h2>{{ zone.name }}</h2>
+      <div class="zone-status {% if zone.current_state %}active{% else %}inactive{% endif %}">
+        {{ zone.current_state|yesno:"ONLINE,OFFLINE" }}
+      </div>
+    </div>
+    
+    <div class="zone-details">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">BUILDING</div>
+          <div class="detail-value">{{ zone.building }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">FLOOR</div>
+          <div class="detail-value">{{ zone.floor }}</div>
+        </div>
+        
+        <div class="detail-item">
+          <div class="detail-label">CURRENT STATE</div>
+          <div class="detail-value state-indicator {% if zone.current_state %}on{% else %}off{% endif %}">
+            {{ zone.current_state|yesno:"ON,OFF" }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <form method="post" class="brutal-form">
+          {% csrf_token %}
+          <div class="control-buttons">
+            <button type="submit" name="action" value="turn_on" class="control-btn on-btn {% if zone.current_state %}disabled{% endif %}">
+              <span class="btn-icon">⚡</span>
+              <span class="btn-text">TURN ON</span>
+            </button>
+            
+            <button type="submit" name="action" value="turn_off" class="control-btn off-btn {% if not zone.current_state %}disabled{% endif %}">
+              <span class="btn-icon">⭘</span>
+              <span class="btn-text">TURN OFF</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <div class="status-panel panel">
+    <div class="panel-header">
+      <h2>CONTROL HISTORY</h2>
+      <div class="grid-marker">
+        <div class="marker-line"></div>
+        <div class="marker-line"></div>
+      </div>
+    </div>
+    
+    <div class="panel-content">
+      <div class="history-timeline">
+        <div class="timeline-entry">
+          <div class="timeline-time">Now</div>
+          <div class="timeline-status {% if zone.current_state %}on{% else %}off{% endif %}">
+            {{ zone.current_state|yesno:"ON,OFF" }}
+          </div>
+        </div>
+        <!-- Additional history items would be populated dynamically -->
+        <div class="timeline-empty">No previous actions recorded</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="back-navigation">
+    <a href="{% url 'dashboard' %}" class="back-btn">
+      <span class="back-icon">←</span>
+      <span>BACK TO DASHBOARD</span>
+    </a>
+  </div>
+</div>
 
-{% if error %}
-    <p style="color: red;">Error: {{ error }}</p>
-{% endif %}
+<style>
+  /* BRUTAL MODERNE ZONE CONTROL */
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --gray-dark: #222222;
+    --gray: #888888;
+    --gray-light: #dddddd;
+    --accent: #ff3300;
+    --green: #00dd66;
+    --red: #ff0033;
+    --blue: #0066ff;
+    --spacing: 40px;
+    --border-thickness: 4px;
+  }
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" name="action" value="turn_on">Turn On</button>
-    <button type="submit" name="action" value="turn_off">Turn Off</button>
-</form>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-<a href="{% url 'dashboard' %}">Back to Dashboard</a>
+  .brutal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing);
+  }
+
+  /* HEADER */
+  .brutal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    border-bottom: var(--border-thickness) solid var(--black);
+    padding-bottom: calc(var(--spacing) / 2);
+  }
+
+  .brutal-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    position: relative;
+  }
+
+  .brutal-title::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 4px;
+    background-color: var(--accent);
+  }
+
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .status-indicator.online {
+    background-color: var(--green);
+    box-shadow: 0 0 10px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  .time-display {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  /* MESSAGE STYLING */
+  .message-container {
+    margin-bottom: var(--spacing);
+  }
+
+  .message {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background-color: var(--white);
+    border-left: 8px solid var(--gray);
+  }
+
+  .message.success {
+    border-left-color: var(--green);
+  }
+
+  .message.error {
+    border-left-color: var(--red);
+  }
+
+  .message-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 12px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .success .message-icon {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .error .message-icon {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  .message-text {
+    font-weight: 500;
+  }
+
+  /* PANEL STYLING */
+  .panel {
+    border: var(--border-thickness) solid var(--black);
+    background-color: var(--white);
+    margin-bottom: var(--spacing);
+  }
+
+  .panel-header {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h2 {
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .grid-marker {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .marker-line {
+    width: 20px;
+    height: 3px;
+    background-color: var(--white);
+  }
+
+  .panel-content {
+    padding: 24px;
+  }
+
+  /* ZONE DETAILS */
+  .zone-status {
+    background-color: var(--white);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 4px 12px;
+  }
+
+  .zone-status.active {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .zone-status.inactive {
+    background-color: var(--gray-light);
+  }
+
+  .zone-details {
+    padding: 24px;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .detail-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray);
+  }
+
+  .detail-value {
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .state-indicator {
+    display: inline-block;
+    padding: 6px 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .state-indicator.on {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .state-indicator.off {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  /* CONTROL SECTION */
+  .control-section {
+    border-top: 1px solid var(--gray-light);
+    padding-top: 30px;
+  }
+
+  .control-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .control-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border: var(--border-thickness) solid var(--black);
+    background-color: var(--white);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .control-btn:hover:not(.disabled) {
+    transform: translateY(-2px);
+  }
+
+  .control-btn.on-btn:hover:not(.disabled) {
+    border-color: var(--green);
+  }
+
+  .control-btn.off-btn:hover:not(.disabled) {
+    border-color: var(--red);
+  }
+
+  .btn-icon {
+    font-size: 30px;
+    margin-bottom: 10px;
+  }
+
+  .on-btn .btn-icon {
+    color: var(--green);
+  }
+
+  .off-btn .btn-icon {
+    color: var(--red);
+  }
+
+  .btn-text {
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .control-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* HISTORY TIMELINE */
+  .history-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .timeline-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  .timeline-time {
+    font-weight: 600;
+  }
+
+  .timeline-status {
+    padding: 4px 12px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .timeline-status.on {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .timeline-status.off {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  .timeline-empty {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--gray);
+    font-style: italic;
+  }
+
+  /* BACK NAVIGATION */
+  .back-navigation {
+    padding-top: calc(var(--spacing) / 2);
+    border-top: 1px solid var(--gray-light);
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--black);
+    text-decoration: none;
+    padding: 8px 0;
+  }
+
+  .back-btn:hover {
+    color: var(--accent);
+  }
+
+  .back-icon {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    :root {
+      --spacing: 20px;
+    }
+    
+    .brutal-title {
+      font-size: 24px;
+    }
+    
+    .detail-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    .control-buttons {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    setTimeout(updateClock, 1000);
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    updateClock();
+    
+    // Disable the already active button (can't turn on what's already on)
+    const currentState = {{ zone.current_state|yesno:"true,false" }};
+    
+    // Add visual feedback for button clicks
+    const buttons = document.querySelectorAll('.control-btn:not(.disabled)');
+    buttons.forEach(button => {
+      button.addEventListener('mousedown', function() {
+        this.style.transform = 'scale(0.98)';
+      });
+      
+      button.addEventListener('mouseup', function() {
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        this.style.transform = 'none';
+      });
+    });
+  });
+</script>
 {% endblock %}

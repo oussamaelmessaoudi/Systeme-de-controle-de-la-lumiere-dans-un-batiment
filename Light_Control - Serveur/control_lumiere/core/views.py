@@ -8,6 +8,13 @@ from django.contrib import messages
 from django import forms
 from .models import Zone, Permission, Schedule, ActivityLog
 from rpc.client import LightController
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from core.models import Schedule
+from core.models import Analytics
+from api.serializers import *
+from django.db.models import Sum
+from django.db.models.functions import TruncDate
 
 # Décorateur personnalisé pour vérifier is_staff
 def staff_member_required(view_func):
@@ -183,3 +190,42 @@ def delete_schedule(request, schedule_id):
         messages.success(request, "Schedule deleted successfully.")
         return redirect('manage_schedules')
     return render(request, 'core/confirm_delete.html', {'object': schedule, 'type': 'schedule'})
+
+class PredictionView(APIView):
+    def get(self, request, zone_id=None):
+        if zone_id:
+            schedules = Schedule.objects.filter(zone_id=zone_id, is_active=True)
+        else:
+            schedules = Schedule.objects.filter(is_active=True)
+        serializer = PredictionSerializer(schedules, many=True)
+        return Response(serializer.data)
+
+def predictions_dashboard(request, zone_id):
+    return render(request, 'core/predictions.html', {'zone_id': zone_id})
+
+class UsageFrequencyView(APIView):
+    def get(self, request):
+        analytics = Analytics.objects.filter(metric_type='usage_frequency').values('metric_value')
+        print(analytics.query)
+        print(list(analytics))
+        serializer = UsageFrequencySerializer(analytics, many=True)
+        return Response(serializer.data)
+
+class EnergyConsumptionView(APIView):
+    def get(self, request):
+        analytics = Analytics.objects.filter(metric_type='energy_consumption').annotate(
+            date=TruncDate('timestamp')
+        ).values('date').annotate(
+            metric_value=Sum('metric_value')
+        ).order_by('date')
+        serializer = EnergyConsumptionSerializer(analytics, many=True)
+        return Response(serializer.data)
+
+def stats_dashboard(request):
+    return render(request, 'core/stats.html')
+
+class PredictionView(APIView):
+    def get(self, request, zone_id):
+        data = []  # Query core_schedule
+        serializer = PredictionSerializer(data, many=True)
+        return Response(serializer.data)

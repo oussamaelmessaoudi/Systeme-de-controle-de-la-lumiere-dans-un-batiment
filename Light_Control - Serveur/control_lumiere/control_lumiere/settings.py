@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'core',
     'rpc',
     'api',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +78,27 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 WSGI_APPLICATION = 'control_lumiere.wsgi.application'
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+CELERY_BEAT_SCHEDULE = {
+    'compute-analytics': {
+        'task': 'core.tasks.compute_analytics',
+        'schedule': 3600.0,
+    },
+    'train-prediction-model': {
+        'task': 'core.tasks.train_prediction_model',
+        'schedule': 86400.0,  # Tous les jours
+    },
+    'predict-usage-patterns': {
+        'task': 'core.tasks.predict_usage_patterns',
+        'schedule': 86400.0,  # Tous les jours
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -85,7 +107,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'light_control',
-        'USER': 'light_user',
+        'USER': 'postgres',
         'PASSWORD': '123456',
         'HOST': 'localhost',
         'PORT': '5432',  # Port par défaut de PostgreSQL
@@ -127,8 +149,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
+# control_lumiere/settings.py
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "control_lumiere/static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+DEBUG = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

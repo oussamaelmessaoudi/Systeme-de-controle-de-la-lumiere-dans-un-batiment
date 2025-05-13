@@ -37,6 +37,10 @@
         <div class="tile-icon">⏱️</div>
         <div class="tile-label">SCHEDULES</div>
       </a>
+      <a href="{% url 'stats' %}" class="admin-tile">
+        <div class="tile-icon">📊</div>
+        <div class="tile-label">STATISTICS</div>
+      </a>
     </div>
   </div>
   {% endif %}
@@ -176,7 +180,7 @@
 
   .admin-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 2px;
     background-color: var(--black);
     padding: 2px;
