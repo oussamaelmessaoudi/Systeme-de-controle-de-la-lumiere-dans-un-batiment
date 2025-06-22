@@ -1,0 +1,521 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="brutal-container">
+  <div class="brutal-header">
+    <h1 class="brutal-title">LIGHTING STATISTICS</h1>
+    <div class="system-status">
+      <div class="status-indicator online"></div>
+      <span>DATA MODE</span>
+      <div class="time-display" id="clock">00:00:00</div>
+    </div>
+  </div>
+  
+  <div class="zones-layout">
+    <!-- Left panel: Usage Frequency Chart -->
+    <div class="panel stats-panel">
+      <div class="panel-header">
+        <h2>USAGE FREQUENCY</h2>
+        <div class="grid-marker">
+          <div class="marker-line"></div>
+          <div class="marker-line"></div>
+        </div>
+      </div>
+      
+      <div class="panel-content">
+        <canvas id="usageFrequencyChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Right panel: Energy Consumption Chart -->
+    <div class="panel stats-panel">
+      <div class="panel-header">
+        <h2>ENERGY CONSUMPTION OVER TIME</h2>
+        <div class="grid-marker">
+          <div class="marker-line"></div>
+          <div class="marker-line"></div>
+        </div>
+      </div>
+      
+      <div class="panel-content">
+        <canvas id="energyConsumptionChart"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bottom panel: Additional Statistics -->
+  <div class="panel stats-summary-panel">
+    <div class="panel-header">
+      <h2>SUMMARY DATA</h2>
+      <div class="stats-count">3</div>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-value" id="totalEnergy">0</div>
+        <div class="stat-label">TOTAL kWh</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">🔌</div>
+        <div class="stat-value" id="peakUsage">0</div>
+        <div class="stat-label">PEAK USAGE (W)</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">💡</div>
+        <div class="stat-value" id="activeZones">0</div>
+        <div class="stat-label">ACTIVE ZONES</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="back-navigation">
+    <a href="{% url 'dashboard' %}" class="back-btn">
+      <span class="back-icon">←</span>
+      <span>BACK TO DASHBOARD</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  /* BRUTAL MODERNE STATS PAGE */
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --gray-dark: #222222;
+    --gray: #888888;
+    --gray-light: #dddddd;
+    --accent: #ff3300;
+    --green: #00dd66;
+    --red: #ff0033;
+    --blue: #0066ff;
+    --spacing: 40px;
+    --border-thickness: 4px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .brutal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing);
+  }
+
+  /* HEADER */
+  .brutal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    border-bottom: var(--border-thickness) solid var(--black);
+    padding-bottom: calc(var(--spacing) / 2);
+  }
+
+  .brutal-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    position: relative;
+  }
+
+  .brutal-title::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 40px;
+    height: 4px;
+    background-color: var(--accent);
+  }
+
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .status-indicator.online {
+    background-color: var(--green);
+    box-shadow: 0 0 10px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  .time-display {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  /* LAYOUT */
+  .zones-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing);
+    margin-bottom: var(--spacing);
+  }
+
+  .panel {
+    border: var(--border-thickness) solid var(--black);
+    background-color: var(--white);
+  }
+
+  .panel-header {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h2 {
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .grid-marker {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .marker-line {
+    width: 20px;
+    height: 3px;
+    background-color: var(--white);
+  }
+
+  .panel-content {
+    padding: 24px;
+    height: 300px;
+  }
+
+  /* STATS SUMMARY */
+  .stats-summary-panel {
+    margin-bottom: var(--spacing);
+  }
+
+  .stats-count {
+    background-color: var(--white);
+    color: var(--black);
+    font-weight: 800;
+    min-width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    padding: 0 8px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background-color: var(--black);
+    padding: 2px;
+  }
+
+  .stat-card {
+    background-color: var(--white);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .stat-icon {
+    font-size: 28px;
+  }
+
+  .stat-value {
+    font-size: 32px;
+    font-weight: 800;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray);
+  }
+
+  /* BACK NAVIGATION */
+  .back-navigation {
+    padding-top: calc(var(--spacing) / 2);
+    border-top: 1px solid var(--gray-light);
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--black);
+    text-decoration: none;
+    padding: 8px 0;
+  }
+
+  .back-btn:hover {
+    color: var(--accent);
+  }
+
+  .back-icon {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 992px) {
+    .zones-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --spacing: 20px;
+    }
+    
+    .brutal-title {
+      font-size: 24px;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // Check if Chart.js loaded
+  if (typeof Chart === 'undefined') {
+    console.error('Chart.js failed to load');
+    document.getElementById('usageFrequencyChart').parentElement.innerHTML = `
+      <div class="text-center" style="color: #ff0033; font-weight: 600; padding: 24px;">
+        Error: Chart.js not loaded
+      </div>`;
+    document.getElementById('energyConsumptionChart').parentElement.innerHTML = `
+      <div class="text-center" style="color: #ff0033; font-weight: 600; padding: 24px;">
+        Error: Chart.js not loaded
+      </div>`;
+  }
+
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    setTimeout(updateClock, 1000);
+  }
+  
+  // Usage Frequency Chart with brutalist styling
+  async function fetchUsageFrequency() {
+    if (typeof Chart === 'undefined') return;
+    try {
+      const response = await fetch('/api/stats/usage-frequency/');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.length === 0) {
+        document.getElementById('usageFrequencyChart').parentElement.innerHTML = `
+          <div class="text-center" style="color: #888888; font-weight: 600; padding: 24px;">
+            No usage frequency data available
+          </div>`;
+        return;
+      }
+      const ctx = document.getElementById('usageFrequencyChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.map(item => new Date(item.timestamp).toLocaleDateString()),
+          datasets: [{
+            label: 'Turn-On Actions',
+            data: data.map(item => item.metric_value),
+            backgroundColor: '#ff3300',
+            borderColor: '#000000',
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { 
+              beginAtZero: true, 
+              grid: { color: '#dddddd' },
+              ticks: { font: { weight: 'bold' } },
+              title: {
+                display: true,
+                text: 'Number of Turn-Ons',
+                font: { weight: 'bold', size: 14 }
+              }
+            },
+            x: { 
+              grid: { display: false },
+              ticks: { font: { weight: 'bold' } },
+              title: {
+                display: true,
+                text: 'Date',
+                font: { weight: 'bold', size: 14 }
+              }
+            }
+          },
+          plugins: {
+            legend: { display: true },
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: function(context) {
+                  return `Turn-Ons: ${context.parsed.y}`;
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Update total active zones
+      document.getElementById('activeZones').textContent = data.length;
+      
+    } catch (error) {
+      console.error('Error fetching usage frequency:', error.message);
+      document.getElementById('usageFrequencyChart').parentElement.innerHTML = `
+        <div class="text-center" style="color: #ff0033; font-weight: 600; padding: 24px;">
+          Error loading usage frequency data: ${error.message}
+        </div>`;
+    }
+  }
+  
+  // Energy Consumption Chart with brutalist styling
+  async function fetchEnergyConsumption() {
+    if (typeof Chart === 'undefined') return;
+    try {
+      const response = await fetch('/api/stats/energy-consumption/');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data.length === 0) {
+        document.getElementById('energyConsumptionChart').parentElement.innerHTML = `
+          <div class="text-center" style="color: #888888; font-weight: 600; padding: 24px;">
+            No energy consumption data available
+          </div>`;
+        return;
+      }
+      const ctx = document.getElementById('energyConsumptionChart').getContext('2d');
+      
+      // Calculate peak usage and total energy
+      const peakUsage = Math.max(...data.map(item => item.metric_value));
+      const totalEnergy = data.reduce((sum, item) => sum + item.metric_value, 0) / 1000;
+      
+      document.getElementById('peakUsage').textContent = Math.round(peakUsage);
+      document.getElementById('totalEnergy').textContent = totalEnergy.toFixed(2);
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map(item => item.date),
+          datasets: [{
+            label: 'Energy Consumption',
+            data: data.map(item => item.metric_value),
+            fill: false,
+            borderColor: '#000000',
+            backgroundColor: '#ff3300',
+            borderWidth: 4,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#000000',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { 
+              beginAtZero: true,
+              grid: { color: '#dddddd' },
+              ticks: { font: { weight: 'bold' } },
+              title: {
+                display: true,
+                text: 'Watt-hours',
+                font: { weight: 'bold', size: 14 }
+              }
+            },
+            x: { 
+              grid: { display: false },
+              ticks: { font: { weight: 'bold' } },
+              title: {
+                display: true,
+                text: 'Date',
+                font: { weight: 'bold', size: 14 }
+              }
+            }
+          },
+          plugins: {
+            legend: { display: true },
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: function(context) {
+                  return `Energy: ${context.parsed.y} Wh`;
+                }
+              }
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching energy consumption:', error.message);
+      document.getElementById('energyConsumptionChart').parentElement.innerHTML = `
+        <div class="text-center" style="color: #ff0033; font-weight: 600; padding: 24px;">
+          Error loading energy consumption data: ${error.message}
+        </div>`;
+    }
+  }
+  
+  // Initialize everything when page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    updateClock();
+    fetchUsageFrequency();
+    fetchEnergyConsumption();
+  });
+</script>
+{% endblock %}

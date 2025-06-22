@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntelliGlow - Light Control System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-dark: #222222;
+            --gray: #888888;
+            --accent: #ff3300;
+            --green: #00dd66;
+            --spacing: 40px;
+            --header-height: 80px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f0f0;
+            color: var(--black);
+            line-height: 1;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* GRID OVERLAY */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+                            linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* HEADER */
+        header {
+            background-color: var(--black);
+            color: var(--white);
+            height: var(--header-height);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 var(--spacing);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+
+        h1 {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            font-size: 28px;
+            position: relative;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 30px;
+            height: 4px;
+            background-color: var(--accent);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .username {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .logout-btn, .login-btn {
+            background-color: transparent;
+            color: var(--white);
+            text-decoration: none;
+            padding: 8px 16px;
+            border: 2px solid var(--white);
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover, .login-btn:hover {
+            background-color: var(--white);
+            color: var(--black);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            padding: var(--spacing);
+            max-width: 1440px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            :root {
+                --spacing: 20px;
+                --header-height: 60px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .username {
+                display: none;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>Intelli<span style="color: #ff3300;">Glow</span></h1>
+            <div class="user-controls">
+                {% if user.is_authenticated %}
+                    <div class="username">
+                        <div class="user-avatar">{{ user.username|first }}</div>
+                        <span>{{ user.username }}</span>
+                    </div>
+                    <a href="{% url 'login' %}" class="logout-btn">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="login-btn">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <script src="{% static 'js/light_control.js' %}"></script>
+    <script>
+        // Add some brutal moderne interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click sound effect to buttons
+            const buttons = document.querySelectorAll('a, button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+                    audio.play();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

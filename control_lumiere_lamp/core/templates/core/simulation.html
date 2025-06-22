@@ -1,0 +1,126 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="brutal-container">
+    <div class="brutal-header">
+        <h1 class="brutal-title">SYSTEM SIMULATION (BY ZONE)</h1>
+        <div class="system-status">
+            <div id="connection-status" class="status-indicator"></div>
+            <span id="connection-text">CONNECTING...</span>
+        </div>
+    </div>
+
+    {% for zone in zones %}
+        <div class="zone-container-main">
+            <div class="zone-header">
+                <h2 class="zone-title-main">ZONE: {{ zone.name }}</h2>
+            </div>
+
+            <div class="zone-content-wrapper">
+                <div class="building-container">
+                    <h3 class="container-title">BUILDING: {{ zone.building }}</h3>
+
+                    <div class="floor-container">
+                        <h4 class="container-title">FLOOR: {{ zone.floor }}</h4>
+
+                        <div class="led-grid">
+                            {% for lamp in zone.lamps.all %}
+                                <div class="led-container">
+                                    <div class="led-indicator off" id="led-{{ lamp.id }}"></div>
+                                    <div class="led-label">{{ lamp.name }}</div>
+                                </div>
+                            {% empty %}
+                                <p class="no-lamps-text">No Lamps</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="panel"><p style="padding: 20px; text-align: center;">No zones found in the database.</p></div>
+    {% endfor %}
+</div>
+
+<style>
+    .zone-container-main {
+        border: 4px solid #000;
+        margin-bottom: 25px;
+        background: #fff;
+    }
+    .zone-header {
+        background: #000;
+        color: #fff;
+        padding: 15px 20px;
+    }
+    .zone-title-main { font-size: 1.4em; text-transform: uppercase; }
+    .zone-content-wrapper { padding: 20px; }
+
+    .building-container {
+        border: 2px solid #555;
+        padding: 15px;
+        background-color: #f4f4f4;
+    }
+    .floor-container {
+        border: 2px solid #888;
+        padding: 15px;
+        margin-top: 15px;
+        background-color: #e9e9e9;
+    }
+    .container-title { margin-bottom: 15px; }
+
+    .led-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 25px;
+    }
+    .led-container { text-align: center; }
+    .led-indicator {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin: 0 auto 10px auto;
+        border: 3px solid #333;
+        transition: all 0.3s ease;
+    }
+    .led-indicator.on { background-color: #00ff6a; box-shadow: 0 0 20px #00ff6a; }
+    .led-indicator.off { background-color: #3d3d3d; }
+    .led-label { font-weight: 600; font-size: 12px; color: #555; }
+    .no-lamps-text { font-size: 14px; color: #999; font-style: italic; grid-column: 1 / -1; text-align: center; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusIndicator = document.getElementById('connection-status');
+        const statusText = document.getElementById('connection-text');
+
+        function fetchLampStatuses() {
+            fetch('/api/lamp-statuses/')
+                .then(response => {
+                    if (!response.ok) { throw new Error('API request failed'); }
+                    statusIndicator.classList.add('online');
+                    statusIndicator.classList.remove('offline');
+                    statusText.textContent = 'LIVE';
+                    return response.json();
+                })
+                .then(data => {
+                    data.forEach(lamp => {
+                        const ledElement = document.getElementById(`led-${lamp.id}`);
+                        if (ledElement) {
+                            if (lamp.status) {
+                                ledElement.classList.add('on');
+                                ledElement.classList.remove('off');
+                            } else {
+                                ledElement.classList.add('off');
+                                ledElement.classList.remove('on');
+                            }
+                        }
+                    });
+                })
+                .catch(error => { console.error('Error:', error); statusIndicator.classList.add('offline'); statusIndicator.classList.remove('online'); statusText.textContent = 'ERROR'; });
+        }
+
+        fetchLampStatuses();
+        setInterval(fetchLampStatuses, 2000); 
+    });
+</script>
+{% endblock %}
