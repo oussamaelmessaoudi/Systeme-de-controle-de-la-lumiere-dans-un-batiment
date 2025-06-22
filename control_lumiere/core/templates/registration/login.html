@@ -1,0 +1,254 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="login-container">
+  <div class="login-header">
+    <h2>System Access</h2>
+    <div class="login-marker"></div>
+  </div>
+  
+  {% if form.errors %}
+  <div class="error-message">
+    <svg viewBox="0 0 24 24" width="24" height="24">
+      <path fill="currentColor" d="M12 4c4.4 0 8 3.6 8 8s-3.6 8-8 8-8-3.6-8-8 3.6-8 8-8m0-2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/>
+      <path fill="currentColor" d="M13 16h-2v-2h2v2zm0-4h-2V7h2v5z"/>
+    </svg>
+    <span>Authentication failed. Check credentials and try again.</span>
+  </div>
+  {% endif %}
+  
+  <form method="post" class="login-form">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      <div class="input-wrapper">
+        <div class="input-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M12 4a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"/>
+          </svg>
+        </div>
+        {{ form.username }}
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      <div class="input-wrapper">
+        <div class="input-icon">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path fill="currentColor" d="M12 17a2 2 0 002-2 2 2 0 00-2-2 2 2 0 00-2 2 2 2 0 002 2m6-9a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V10a2 2 0 012-2h1V6a5 5 0 015-5 5 5 0 015 5v2h1m-6-5a3 3 0 00-3 3v2h6V6a3 3 0 00-3-3z"/>
+          </svg>
+        </div>
+        {{ form.password }}
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button type="submit" class="login-button">
+        <span>Login</span>
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+        </svg>
+      </button>
+      <a href="{% url 'dashboard' %}" class="back-link">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        <span>Back to Dashboard</span>
+      </a>
+    </div>
+    
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+  
+  <div class="login-footer">
+    <div class="security-notice">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+      </svg>
+      <span>Secure Connection</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .login-container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: var(--white);
+    border: 4px solid var(--black);
+    position: relative;
+  }
+  
+  .login-header {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 20px;
+    position: relative;
+  }
+  
+  .login-header h2 {
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+  
+  .login-marker {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--accent);
+    animation: blink 2s infinite;
+  }
+  
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+  
+  .error-message {
+    background-color: rgba(255, 51, 0, 0.1);
+    border-left: 4px solid var(--accent);
+    margin: 20px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .login-form {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    border: 2px solid var(--black);
+  }
+  
+  .input-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    background-color: var(--black);
+    color: var(--white);
+  }
+  
+  .input-wrapper input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background-color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+  }
+  
+  .input-wrapper input:focus {
+    outline: none;
+    background-color: #f8f8f8;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+  }
+  
+  .login-button {
+    background-color: var(--black);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+  
+  .login-button:hover {
+    background-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  
+  .back-link:hover {
+    color: var(--black);
+  }
+  
+  .login-footer {
+    background-color: #f5f5f5;
+    padding: 15px 20px;
+    border-top: 1px solid #eaeaea;
+  }
+  
+  .security-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .login-container {
+      margin: 0 auto;
+      border-left: none;
+      border-right: none;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .login-button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .back-link {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}

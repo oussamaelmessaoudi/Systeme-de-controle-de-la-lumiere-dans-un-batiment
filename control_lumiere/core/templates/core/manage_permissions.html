@@ -1,0 +1,579 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="brutal-container">
+  <div class="brutal-header">
+    <h1 class="brutal-title">PERMISSIONS MANAGEMENT</h1>
+    <div class="system-status">
+      <div class="status-indicator online"></div>
+      <span>SECURE ZONE</span>
+      <div class="time-display" id="clock">00:00:00</div>
+    </div>
+  </div>
+
+  {% if messages %}
+    <div class="message-container">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">
+          <div class="message-icon">
+            {% if message.tags == 'success' %}✓{% elif message.tags == 'error' %}!{% else %}i{% endif %}
+          </div>
+          <div class="message-text">{{ message }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="permissions-layout">
+    <!-- Left panel: Add new permission -->
+    <div class="permission-form-panel">
+      <div class="panel-header">
+        <h2>ADD NEW PERMISSION</h2>
+        <div class="header-decoration">
+          <div class="decoration-line"></div>
+          <div class="decoration-line"></div>
+        </div>
+      </div>
+      
+      <form method="post" class="brutal-form">
+        {% csrf_token %}
+        <div class="form-grid">
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="field-errors">
+                  {% for error in field.errors %}
+                    <div class="error">{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="submit-btn">
+          <span class="btn-text">ADD PERMISSION</span>
+          <span class="btn-icon">+</span>
+        </button>
+      </form>
+    </div>
+    
+    <!-- Right panel: Existing permissions -->
+    <div class="permissions-list-panel">
+      <div class="panel-header">
+        <h2>EXISTING PERMISSIONS</h2>
+        <div class="permissions-count">{{ permissions|length }}</div>
+      </div>
+      
+      {% if permissions %}
+        <div class="permissions-table">
+          <div class="table-header">
+            <div class="col-user">USER</div>
+            <div class="col-zone">ZONE</div>
+            <div class="col-view">VIEW</div>
+            <div class="col-control">CONTROL</div>
+            <div class="col-actions">ACTIONS</div>
+          </div>
+          
+          <div class="table-body">
+            {% for permission in permissions %}
+              <div class="table-row">
+                <div class="col-user">
+                  <div class="user-avatar">{{ permission.user.username|first }}</div>
+                  <span>{{ permission.user.username }}</span>
+                </div>
+                <div class="col-zone">{{ permission.zone.name }}</div>
+                <div class="col-view">
+                  <div class="permission-indicator {% if permission.can_view %}enabled{% else %}disabled{% endif %}">
+                    {% if permission.can_view %}YES{% else %}NO{% endif %}
+                  </div>
+                </div>
+                <div class="col-control">
+                  <div class="permission-indicator {% if permission.can_control %}enabled{% else %}disabled{% endif %}">
+                    {% if permission.can_control %}YES{% else %}NO{% endif %}
+                  </div>
+                </div>
+                <div class="col-actions">
+                  <a href="{% url 'delete_permission' permission.id %}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this permission?')">
+                    DELETE
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <div class="empty-permissions">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-message">NO PERMISSIONS FOUND</div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="back-navigation">
+    <a href="{% url 'dashboard' %}" class="back-btn">
+      <span class="back-icon">←</span>
+      <span>BACK TO DASHBOARD</span>
+    </a>
+  </div>
+</div>
+
+<style>
+  /* BRUTAL MODERNE PERMISSIONS MANAGEMENT */
+  :root {
+    --black: #000000;
+    --white: #ffffff;
+    --gray-dark: #222222;
+    --gray: #888888;
+    --gray-light: #dddddd;
+    --accent: #ff3300;
+    --green: #00dd66;
+    --red: #ff0033;
+    --blue: #0066ff;
+    --spacing: 40px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .brutal-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing);
+  }
+
+  /* HEADER */
+  .brutal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing);
+    border-bottom: 4px solid var(--black);
+    padding-bottom: calc(var(--spacing) / 2);
+  }
+
+  .brutal-title {
+    font-size: 32px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    position: relative;
+  }
+
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .status-indicator.online {
+    background-color: var(--green);
+    box-shadow: 0 0 10px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  .time-display {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 4px 8px;
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  /* MESSAGE STYLING */
+  .message-container {
+    margin-bottom: var(--spacing);
+  }
+
+  .message {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background-color: var(--white);
+    border-left: 8px solid var(--gray);
+  }
+
+  .message.success {
+    border-left-color: var(--green);
+  }
+
+  .message.error {
+    border-left-color: var(--red);
+  }
+
+  .message-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: 12px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .success .message-icon {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .error .message-icon {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  .message-text {
+    font-weight: 500;
+  }
+
+  /* LAYOUT */
+  .permissions-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: var(--spacing);
+    margin-bottom: var(--spacing);
+  }
+
+  .permission-form-panel, .permissions-list-panel {
+    border: 4px solid var(--black);
+    background-color: var(--white);
+  }
+
+  .panel-header {
+    background-color: var(--black);
+    color: var(--white);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-header h2 {
+    font-size: 18px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .header-decoration {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .decoration-line {
+    width: 20px;
+    height: 3px;
+    background-color: var(--white);
+  }
+
+  .permissions-count {
+    background-color: var(--white);
+    color: var(--black);
+    font-weight: 800;
+    min-width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    padding: 0 8px;
+  }
+
+  /* FORM STYLING */
+  .brutal-form {
+    padding: 24px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px;
+    border: 2px solid var(--black);
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+
+  .field-errors {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  .submit-btn {
+    background-color: var(--black);
+    color: var(--white);
+    border: none;
+    padding: 14px 24px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+  }
+
+  .submit-btn:hover {
+    background-color: var(--accent);
+  }
+
+  .btn-icon {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* TABLE STYLING */
+  .permissions-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 80px 80px 100px;
+    background-color: var(--gray-light);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .table-header > div {
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--black);
+  }
+
+  .table-body {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 80px 80px 100px;
+    border-bottom: 1px solid var(--gray-light);
+    transition: background-color 0.2s ease;
+  }
+
+  .table-row:hover {
+    background-color: rgba(0,0,0,0.03);
+  }
+
+  .table-row > div {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .col-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    background-color: var(--gray-dark);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .permission-indicator {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 12px;
+    text-align: center;
+    min-width: 40px;
+  }
+
+  .permission-indicator.enabled {
+    background-color: var(--green);
+    color: var(--white);
+  }
+
+  .permission-indicator.disabled {
+    background-color: var(--gray-light);
+    color: var(--gray);
+  }
+
+  .delete-btn {
+    background-color: transparent;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+
+  .delete-btn:hover {
+    background-color: var(--red);
+    color: var(--white);
+  }
+
+  /* EMPTY STATE */
+  .empty-permissions {
+    padding: 60px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .empty-icon {
+    font-size: 40px;
+  }
+
+  .empty-message {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--gray);
+  }
+
+  /* BACK NAVIGATION */
+  .back-navigation {
+    padding-top: calc(var(--spacing) / 2);
+    border-top: 1px solid var(--gray-light);
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--black);
+    text-decoration: none;
+    padding: 8px 0;
+  }
+
+  .back-btn:hover {
+    color: var(--accent);
+  }
+
+  .back-icon {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 992px) {
+    .permissions-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    :root {
+      --spacing: 20px;
+    }
+    
+    .brutal-title {
+      font-size: 24px;
+    }
+    
+    .table-header, .table-row {
+      grid-template-columns: 120px 1fr 60px 60px 80px;
+    }
+    
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .table-header, .table-row {
+      grid-template-columns: 100px 1fr 50px 50px 70px;
+      font-size: 12px;
+    }
+    
+    .table-header > div, .table-row > div {
+      padding: 10px 8px;
+    }
+    
+    .user-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+    }
+  }
+</style>
+
+<script>
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+    setTimeout(updateClock, 1000);
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    updateClock();
+  });
+</script>
+{% endblock %}
