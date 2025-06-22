@@ -1,0 +1,4 @@
+websockets
+json-rpc
+psycopg2
+python-dotenv

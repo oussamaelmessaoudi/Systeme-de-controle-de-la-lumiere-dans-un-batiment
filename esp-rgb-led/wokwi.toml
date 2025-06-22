@@ -1,0 +1,8 @@
+[wokwi]
+version = 1
+firmware = '.pio\build\esp32doit-devkit-v1\firmware.bin'
+elf = '.pio\build\esp32doit-devkit-v1\firmware.elf'
+
+[[net]]
+port = 80       # المنفذ الذي يستمع عليه الخادم داخل المحاكاة
+hostPort = 9080 # المنفذ الذي سيستمع عليه VS Code على جهازك
